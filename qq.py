@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-"""Launching web browsers for PowerToys Run"""
+"""Launching web browsers for PowerToys Run v0.2"""
 # Maintained by engrbugs.
 
 import re
