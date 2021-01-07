@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """Launching web browsers for PowerToys Run"""
-# App version is 0.7
+# App version is 0.71
 # Maintained by engrbugs.
 
 import re
@@ -10,11 +10,11 @@ import webbrowser
 
 def browse(choice, words):
     print(f'opening, {choice}, {words}')
-    if re.match(r'[1qazQAZ]', choice):
+    if re.match(r'[1qagQAG]', choice):
         webbrowser.open(f'https://www.google.com/search?q={words}')
-    if re.match(r'[2wsxWSX]', choice):
+    if re.match(r'[2wstWST]', choice):
         webbrowser.open(f'https://www.thesaurus.com/browse/{words}')
-    if re.match(r'[3edcEDC]', choice):
+    if re.match(r'[3edyEDY]', choice):
         webbrowser.open(f'https://www.youtube.com/results?search_query={words}')
     if re.match(r'[4rfRF]', choice):
         webbrowser.open(f'https://reversedictionary.org/wordsfor/{words}')
