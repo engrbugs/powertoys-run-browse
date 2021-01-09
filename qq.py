@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """Launching web browsers for PowerToys Run"""
-# App version is 0.71
+version = 0.72
 # Maintained by engrbugs.
 
 import re
@@ -21,8 +21,9 @@ def browse(choice, words):
 
 
 if __name__ == '__main__':
-    print('*Default')  # New Line
-    print('[1*]Google,[2]Thesaurus,[3]Youtube,[4]Reverse Dictionary', end=">    ")
+    print(f'*Default v{version}')  # New Line
+    print('[1*]Google,[2]Thesaurus,')
+    print('[3]Youtube,[4]Reverse Dictionary', end=">    ")
     inputted_string = input()
     #  Clean white spaces from beginning to end.
     x = inputted_string.strip()
