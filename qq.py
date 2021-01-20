@@ -1,11 +1,10 @@
 #! /usr/bin/env python3
-
-"""Launching web browsers for PowerToys Run"""
-version = 0.72
-# Maintained by engrbugs.
-
 import re
 import webbrowser
+
+"""Launching web browsers for PowerToys Run"""
+version = 0.721
+# Maintained by engrbugs.
 
 
 def browse(choice, words):
@@ -17,7 +16,7 @@ def browse(choice, words):
     if re.match(r'[3edyEDY]', choice):
         webbrowser.open(f'https://www.youtube.com/results?search_query={words}')
     if re.match(r'[4rfRF]', choice):
-        webbrowser.open(f'https://reversedictionary.org/wordsfor/{words}')
+        webbrowser.open(f'https://www.onelook.com/reverse-dictionary.shtml?s={words}')
 
 
 if __name__ == '__main__':
