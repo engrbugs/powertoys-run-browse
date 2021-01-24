@@ -1,6 +1,6 @@
 # powertoys-run-browse
 Launching web browsers for PowerToys Run
-![Sample](readme-images/powertoys-run-browse.gif) 
+[![Action](readme-images/powertoys-run-browse.gif)](http://<span></span>example.com)
 </br>
 See this in action.
 
