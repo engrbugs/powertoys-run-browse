@@ -18,5 +18,5 @@ copy the qq shortcut to C:\ *ProgramData\Microsoft\Windows\Start Menu\Programs
 \*this text is surrounded by literal asterisks\*
 *single asterisks*
 _single underscores_
-` C:\ProgramData\Microsoft\Windows\Start Menu\Programs`
+`C:\ProgramData\Microsoft\Windows\Start Menu\Programs`
 foo \\\[something\\\] bar
