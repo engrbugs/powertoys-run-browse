@@ -14,9 +14,6 @@ rename it to "qq".
     - If you prefer [Windows Terminal](
       https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab)
       to run instead of typical cmd, just append "wt" + `space` before the "py...".
-
 2.  Move the qq shortcut to `C:\ProgramData\Microsoft\Windows\Start Menu\Programs`.
-
 3.  Run the script using Alt+Space (PowerToys) or Windows key and type "qq".
-
 4.  Enjoy!
