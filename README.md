@@ -4,5 +4,9 @@ Launching web browsers for PowerToys Run
 </br>
 See this in action.
 
+## Prerequisite:
+- [Python 3](https://www.python.org/downloads/)
+- [Microsoft PowerToys](https://github.com/microsoft/PowerToys/releases/)
+
 ## How to Install:
 To be continued...
