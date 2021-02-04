@@ -3,7 +3,7 @@ import re
 import webbrowser
 
 """Launching web browsers for PowerToys Run"""
-version = 0.721
+version = '1.0.0'
 # Maintained by engrbugs.
 
 
@@ -35,5 +35,7 @@ if __name__ == '__main__':
     elif re.match(r'(?i)^([1-4]|[qwe]|[asdf]|[gtyr])\s', x):
         browse(x[0:1], x[1:len(x)].strip())
     #  Search with default option--Google.
+    elif x.lower() == 'exit':
+        quit()
     else:
         browse('1', x)
