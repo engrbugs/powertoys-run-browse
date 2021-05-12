@@ -3,7 +3,7 @@ import re
 import webbrowser
 
 """Launching web browsers for PowerToys Run"""
-version = '1.0.0'
+version = '1.0.1'
 # Maintained by engrbugs.
 
 
@@ -17,22 +17,26 @@ def browse(choice, words):
         webbrowser.open(f'https://www.youtube.com/results?search_query={words}')
     if re.match(r'[4rfRF]', choice):
         webbrowser.open(f'https://www.onelook.com/reverse-dictionary.shtml?s={words}')
+    if re.match(r'[5pP]', choice):
+        webbrowser.open(f'https://www.google.com/search?q={words} pronunciation')
 
 
 if __name__ == '__main__':
     print(f'*Default v{version}')  # New Line
     print('[1*]Google,[2]Thesaurus,')
-    print('[3]Youtube,[4]Reverse Dictionary', end=">    ")
+    print('[3]Youtube,[4]Reverse Dictionary')
+    print('[5]Goggle Pronunciation', end=">    ")
+
     inputted_string = input()
     #  Clean white spaces from beginning to end.
     x = inputted_string.strip()
     #  When inputted with ONE CHAR, it will ask for what to browse.
-    if re.match(r'(?i)^[1-4]$|^[qwe]$|^[asdf]$|^[gtyr]$', x):
+    if re.match(r'(?i)^[1-5]$|^[qwep]$|^[asdf]$|^[gtyr]$', x):
         print('What to search', end=":                        ")
         word = input()
         browse(x, word.strip())
     #  Automatically extract the first char when detects whitespace on the 2nd char
-    elif re.match(r'(?i)^([1-4]|[qwe]|[asdf]|[gtyr])\s', x):
+    elif re.match(r'(?i)^([1-5]|[qwep]|[asdf]|[gtyr])\s', x):
         browse(x[0:1], x[1:len(x)].strip())
     #  Search with default option--Google.
     elif x.lower() == 'exit':
