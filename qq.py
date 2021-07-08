@@ -4,13 +4,19 @@ import webbrowser
 
 """Launching web browsers for PowerToys Run"""
 version = '1.0.2'
+
+
 # Maintained by engrbugs.
 
 
 def browse(choice, words):
     print(f'opening, {choice}, {words}')
     if re.match(r'[1qQ]', choice):
-        webbrowser.open(f'https://www.google.com/search?q={words}')
+        # check '#' character in choice replace it with %23 if found.
+        google_word = ''
+        for c in words:
+            google_word += '%23' if c == '#' else c
+        webbrowser.open(f'https://www.google.com/search?q={google_word}')
     elif re.match(r'[2]', choice):
         webbrowser.open(f'https://www.thesaurus.com/browse/{words}')
     elif re.match(r'[3yY]', choice):
