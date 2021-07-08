@@ -20,7 +20,10 @@ def browse(choice, words):
     elif re.match(r'[2]', choice):
         webbrowser.open(f'https://www.thesaurus.com/browse/{words}')
     elif re.match(r'[3yY]', choice):
-        webbrowser.open(f'https://www.youtube.com/results?search_query={words}')
+        if words == 'main':
+            webbrowser.open(f'https://www.youtube.com')
+        else:
+            webbrowser.open(f'https://www.youtube.com/results?search_query={words}')
     elif re.match(r'[4]', choice):
         webbrowser.open(f'https://www.onelook.com/reverse-dictionary.shtml?s={words}')
     elif re.match(r'[5pP]', choice):
@@ -28,9 +31,15 @@ def browse(choice, words):
     elif re.match(r'[rR]', choice):
         webbrowser.open(f'https://www.reddit.com/')
     elif re.match(r'[6]', choice):
-        webbrowser.open(f'https://github.com/search?q={words}')
+        if words == 'main':
+            webbrowser.open(f'https://github.com')
+        else:
+            webbrowser.open(f'https://github.com/search?q={words}')
     elif re.match(r'[7]', choice):
-        webbrowser.open(f'https://stackoverflow.com/search?q={words}')
+        if words == 'main':
+            webbrowser.open(f'https://stackoverflow.com')
+        else:
+            webbrowser.open(f'https://stackoverflow.com/search?q={words}')
 
 
 if __name__ == '__main__':
