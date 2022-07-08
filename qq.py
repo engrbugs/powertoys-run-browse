@@ -3,11 +3,21 @@ import re
 import webbrowser
 
 """Launching web browsers for PowerToys Run"""
-version = '1.0.3'
-default_options = '2'
+version = '1.0.5'
+default_options = '1'
 
-
-
+SHORTCUTS = {
+    "Define": ['https://www.google.com/search?q={words} define', '1', 'q'],
+    "Thesaurus": ['https://www.google.com/search?q={words} define', '2', 't'],
+    "Youtube": ['https://www.google.com/search?q={words} define', '3', 'y'],
+    "Reverse Dictionary": ['https://www.google.com/search?q={words} define', '4', 'q'],
+    "Google Pronunciation": ['https://www.google.com/search?q={words} define', '5', 'p'],
+    "Github": ['https://www.google.com/search?q={words} define', '6', 'g'],
+    "stackoverflow": ['https://www.google.com/search?q={words} define', '7', 's'],
+    "Calendar": ['https://www.google.com/search?q={words} define', '8', 'c'],
+    "Reddit": ['https://www.google.com/search?q={words} define', 'R'],
+    "Twitter": ['https://www.google.com/search?q={words} define', 'T'],
+}
 # Maintained by engrbugs.
 
 
@@ -18,9 +28,9 @@ def browse(browse_choice, words):
         google_word = ''
         for c in words:
             google_word += '%23' if c == '#' else c
-        webbrowser.open(f'https://www.google.com/search?q={google_word}')
+        webbrowser.open(f'https://www.google.com/search?q={google_word} define')
     elif re.match(r'[2]', browse_choice):
-        webbrowser.open(f'https://www.thesaurus.com/browse/{words}')
+        webbrowser.open(f'https://www.google.com/search?q={words} thesaurus')
     elif re.match(r'[3yY]', browse_choice):
         if words == 'main':
             webbrowser.open(f'https://www.youtube.com')
@@ -45,16 +55,19 @@ def browse(browse_choice, words):
 
 
 if __name__ == '__main__':
-    options = lambda x: x + "*" if x == default_options else x
+
+    #   PAINT SCREEN
+    is_default = lambda x: x + "*" if x == default_options else x
     print(f'*Default v{version}')  # New Line
-    print(f'[{options("1")}]Google,'
-          f'[{options("2")}]Thesaurus')
-    print(f'[{options("3")}]Youtube,'
-          f'[{options("4")}]Reverse Dictionary')
-    print(f'[{options("5")}]Goggle Pronunciation,'
-          f'[{options("R")}]Reddit')
-    print(f'[{options("6")}]Github,'
-          f'[{options("7")}]stackoverflow', end=">    ")
+    keys = list(SHORTCUTS)
+    for i in range(0, len(SHORTCUTS)):
+        s = f'[{is_default(SHORTCUTS[keys[i]][1])}]{keys[i]}'
+        if i == len(keys)-1:
+            print(s, end=">    ")
+        elif i % 2 == 0:
+            print(s, end=", ")
+        elif i % 2 == 1:
+            print(s)
 
     inputted_string = input()
     #  Clean white spaces from beginning to end.
