@@ -56,7 +56,7 @@ def browse(browse_choice, words):
 
 if __name__ == '__main__':
 
-    #   PAINT SCREEN
+    #   PAINT SCREEN.
     is_default = lambda x: x + "*" if x == default_options else x
     print(f'*Default v{version}')  # New Line
     keys = list(SHORTCUTS)
