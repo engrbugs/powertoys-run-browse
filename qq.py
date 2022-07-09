@@ -1,9 +1,11 @@
 #! /usr/bin/env python3
 import re
 import webbrowser
+from dateutil.parser import parse
+import datetime
 
 """Launching web browsers for PowerToys Run"""
-version = '1.0.6'
+version = '1.0.7'
 default_options = '1'
 
 SHORTCUTS = {
@@ -14,7 +16,7 @@ SHORTCUTS = {
     "Google Pronunciation": ['https://www.google.com/search?q={words} pronunciation', '5', 'p'],
     "Github": ['https://github.com/search?q={words}', '6', 'g'],
     "stackoverflow": ['https://stackoverflow.com/search?q={words}', '7', 's'],
-    "Calendar": ['https://www.google.com/search?q={words} define', '8', 'c'],
+    "Calendar": ['https://calendar.google.com/calendar/u/0/r/day/{words}', '8', 'c'],
     "Reddit": ['https://www.reddit.com/', 'R'],
     "Twitter": ['https://www.twitter.com/', 'T'],
 }
@@ -26,6 +28,37 @@ def browse(browse_choice, words):
     for k in SHORTCUTS:
         if any(a in SHORTCUTS[k] for a in [browse_choice.lower(), browse_choice.upper()]):
             if '{' in SHORTCUTS[k][0]:
+                if k == 'Calendar':
+                    okay = None
+                    while okay is None:
+                        if words == '' or words == 'main':
+                            main_website = SHORTCUTS[k][0][:SHORTCUTS[k][0].rfind('/')].replace('day', 'month')
+                            webbrowser.open(main_website)
+                            quit()
+                        try:
+                            date = parse(words)
+                            words = date.strftime('%Y/%#m/%#d')
+                            webbrowser.open(SHORTCUTS[k][0].format(words=words))
+                            break
+                        except:
+                            today = datetime.date.today()
+                            if words.lower() == 'today':
+                                today = datetime.date.today()
+                                words = today.strftime('%Y/%#m/%#d')
+                            elif words.lower() == 'yesterday':
+                                yesterday = today - datetime.timedelta(days=1)
+                                words = yesterday.strftime('%Y/%#m/%#d')
+                            elif words.lower() == 'tomorrow':
+                                tomorrow = today + datetime.timedelta(days=1)
+                                words = tomorrow.strftime('%Y/%#m/%#d')
+                            else:
+                                print('Cannot read date')
+                                print('Please enter new date or press ENTER for month)', end=":    ")
+                                words = input()
+                if words == 'main':
+                    main_website = SHORTCUTS[k][0][:SHORTCUTS[k][0].find('/', 9)+1]
+                    webbrowser.open(main_website)
+                    quit()
                 # check '#' character in choice replace it with %23 if found. for C#
                 if '#' in words:
                     google_word = ''
@@ -35,10 +68,6 @@ def browse(browse_choice, words):
                 if words == '':
                     print('What to search', end=":                        ")
                     words = input()
-                if words == 'main':
-                    main_website = SHORTCUTS[k][0][:SHORTCUTS[k][0].find('/', 9)+1]
-                    webbrowser.open(main_website)
-                    quit()
                 webbrowser.open(SHORTCUTS[k][0].format(words=words))
             else:
                 webbrowser.open(SHORTCUTS[k][0])
