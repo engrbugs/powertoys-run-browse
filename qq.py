@@ -5,7 +5,7 @@ from dateutil.parser import parse
 import datetime
 
 """Launching web browsers for PowerToys Run"""
-version = '1.0.7'
+version = '1.0.8'
 default_options = '1'
 
 SHORTCUTS = {
@@ -23,6 +23,12 @@ SHORTCUTS = {
 # Maintained by engrbugs.
 
 
+def open_main_website(link):
+    main_website = link[:link.find('/', 9) + 1]
+    webbrowser.open(main_website)
+    quit()
+
+
 def browse(browse_choice, words):
     print(f'opening, {browse_choice}, {words}')
     for k in SHORTCUTS:
@@ -38,27 +44,23 @@ def browse(browse_choice, words):
                         try:
                             date = parse(words)
                             words = date.strftime('%Y/%#m/%#d')
-                            webbrowser.open(SHORTCUTS[k][0].format(words=words))
                             break
                         except:
                             today = datetime.date.today()
-                            if words.lower() == 'today':
+                            if words.lower() == 'today' or words.lower() == 'now':
                                 today = datetime.date.today()
                                 words = today.strftime('%Y/%#m/%#d')
-                            elif words.lower() == 'yesterday':
+                            elif words.lower() == 'yesterday' or words.lower() == 'yday':
                                 yesterday = today - datetime.timedelta(days=1)
                                 words = yesterday.strftime('%Y/%#m/%#d')
-                            elif words.lower() == 'tomorrow':
+                                print(words)
+                            elif words.lower() == 'tomorrow' or words.lower() == 'tom':
                                 tomorrow = today + datetime.timedelta(days=1)
                                 words = tomorrow.strftime('%Y/%#m/%#d')
                             else:
                                 print('Cannot read date')
                                 print('Please enter new date or press ENTER for month)', end=":    ")
                                 words = input()
-                if words == 'main':
-                    main_website = SHORTCUTS[k][0][:SHORTCUTS[k][0].find('/', 9)+1]
-                    webbrowser.open(main_website)
-                    quit()
                 # check '#' character in choice replace it with %23 if found. for C#
                 if '#' in words:
                     google_word = ''
@@ -67,10 +69,13 @@ def browse(browse_choice, words):
                     words = google_word
                 if words == '':
                     print('What to search', end=":                        ")
-                    words = input()
-                webbrowser.open(SHORTCUTS[k][0].format(words=words))
+                    words = input().strip()
             else:
                 webbrowser.open(SHORTCUTS[k][0])
+            if words.lower() == 'main':
+                open_main_website(SHORTCUTS[k][0])
+            else:
+                webbrowser.open(SHORTCUTS[k][0].format(words=words))
 
 
 if __name__ == '__main__':
@@ -89,8 +94,7 @@ if __name__ == '__main__':
             print(s)
 
     #   INPUT MODE
-    inputted_string = input()
-    inputted_string = inputted_string.strip()
+    inputted_string = input().strip()
 
     # OLD REGEX : re.match(r'(?i)^[1-7]$|^[qwep]$|^[asdf]$|^[gty]$|^[r]$', inputted_string)
     # Put all shortcuts in one string
@@ -99,10 +103,12 @@ if __name__ == '__main__':
         for ii in i[1][1:]:
             regex += ii
 
-    if re.match(fr'(?i)^([{regex}])|\s', inputted_string):
+    if re.match(fr'(?i)(^[{regex}]$)|(^[{regex}]\s)', inputted_string):
         browse(inputted_string[0:1], inputted_string[1:len(inputted_string)].strip())
     elif inputted_string.lower() == 'exit':
         quit()
     else:
         #  Search with default option--Google.
         browse(default_options, inputted_string)
+
+
