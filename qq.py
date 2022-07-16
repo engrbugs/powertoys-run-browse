@@ -70,6 +70,7 @@ def browse(browse_choice, words):
                 if words == '':
                     print('What to search', end=":                        ")
                     words = input().strip()
+                    words = 'main' if words == "" else words
             else:
                 webbrowser.open(SHORTCUTS[k][0])
             if words.lower() == 'main':
