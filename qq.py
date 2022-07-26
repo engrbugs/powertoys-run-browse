@@ -73,6 +73,7 @@ def browse(browse_choice, words):
                     words = 'main' if words == "" else words
             else:
                 webbrowser.open(SHORTCUTS[k][0])
+                quit()
             if words.lower() == 'main':
                 open_main_website(SHORTCUTS[k][0])
             else:
