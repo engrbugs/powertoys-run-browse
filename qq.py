@@ -5,10 +5,10 @@ from dateutil.parser import parse
 import datetime
 import clipboard as cp
 import time
-
+import pyperclip
 
 """Launching web browsers for PowerToys Run"""
-version = '1.0.9'
+version = '1.1.0'
 default_options = '1'
 
 SHORTCUTS = {
@@ -27,14 +27,17 @@ SHORTCUTS = {
     "Chat-GPT": ['[chat_gpt]', 'C'],
 }
 chat_gpt_main_website = "https://chat.openai.com/chat"
+#  (X) marks the spot for pyperclip
 CHATGPT = {
-    '1': ['correct my grammar:\n'],
+    '1': ['Please correct my grammar:\n(X)'],
+    '11': ['correct my grammar, answer only the corrected context. Without your typical introduction and conclusion:\n'],
     '2': ['improve my paragraph'],
-    '3': ['make it powerful'],
-    '4': ['provide me with a first draft for '],
+    '3': ['make that powerful'],
+    '4': ['Please provide my first draft for '],
     '5': ['Summarize this for a high school student:\n'],
+    '55': ["explain that to me like I’m a five-year-old kid"],
     '6': ['what is the difference between '],
-    '11': ['correct my grammar without punctuation or quotation marks or anything, but just the revision:\n'],
+
 }
 
 
@@ -49,7 +52,8 @@ def chat_gpt(words):
 
     if words in CHATGPT:
         for phrase in CHATGPT[words]:
-            cp.copy_to_clipboard(phrase)
+            text_in_clipboard = pyperclip.paste()
+            cp.copy_to_clipboard(phrase.replace("(X)",text_in_clipboard))
             if len(CHATGPT[words]) != 1:
                 time.sleep(1)
 
