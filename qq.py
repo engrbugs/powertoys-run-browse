@@ -8,7 +8,7 @@ import time
 import pyperclip
 
 """Launching web browsers for PowerToys Run"""
-version = '1.1.0'
+version = '1.2.0'
 default_options = '1'
 
 SHORTCUTS = {
@@ -25,6 +25,7 @@ SHORTCUTS = {
     "Ludwig": ['https://ludwig.guru/s/{words}', '9', 'L'],
     "Bible": ['https://www.biblegateway.com/quicksearch/?quicksearch={words}&version=NIV', 'B'],
     "Chat-GPT": ['[chat_gpt]', 'C'],
+    "GrammarGPT": ['[GrammarGPT]', 'C1', False]  # False is the visibility (typical)
 }
 chat_gpt_main_website = "https://chat.openai.com/chat"
 #  (X) marks the spot for pyperclip
@@ -33,13 +34,38 @@ CHATGPT = {
     '11': ['correct my grammar, answer only the corrected context. Without your typical introduction and conclusion:\n'],
     '2': ['improve my paragraph'],
     '3': ['make that powerful'],
-    '4': ['Please provide my first draft for '],
+    '4': ["(X)\nCompose an email draft that addresses the above context, here's the reponse points:"],
     '5': ['Summarize this for a high school student:\n'],
     '55': ["explain that to me like I’m a five-year-old kid"],
     '6': ['what is the difference between '],
 
 }
 
+def count_visible_shortcuts(shortcuts_dict):
+    count = 0
+    for value in shortcuts_dict.values():
+        # Check if the last element exists and is not False
+        if value and value[-1] is not False:
+            count += 1
+    return count
+
+def GrammarGPT(words):
+    if words == '':
+        print('What to put in clipboard')
+        for key, value in CHATGPT.items():
+            print(key, value)
+        print('pick number', end=":                        ")
+        words = input().strip()
+
+    text_in_clipboard = pyperclip.paste()
+    cp.copy_to_clipboard(CHATGPT['1'].replace("(X)", text_in_clipboard))
+
+    #  webbrowser.open(chat_gpt_main_website)
+    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 # Maintained by engrbugs.
 def chat_gpt(words):
@@ -130,29 +156,34 @@ def browse(browse_choice, words):
 
 if __name__ == '__main__':
     #   PAINT SCREEN
+    len_shortcuts_shown = count_visible_shortcuts(SHORTCUTS)
     is_default = lambda x: x + "*" if x == default_options else x
     print(f'*Default v{version}')  # New Line
-    keys = list(SHORTCUTS)
-    for i in range(0, len(SHORTCUTS)):
-        s = f'[{is_default(SHORTCUTS[keys[i]][1])}]{keys[i]}'
-        if i == len(keys) - 1:
-            print(s, end=">    ")
-        elif i % 2 == 0:
-            print(s, end=", ")
-        elif i % 2 == 1:
-            print(s)
+    shortcut_titles = [title for title, value in SHORTCUTS.items() if value and value[-1] is not False]
+    for i in range(0, len_shortcuts_shown):
+        s = f'[{is_default(SHORTCUTS[shortcut_titles[i]][1])}]{shortcut_titles[i]}'
+        if len_shortcuts_shown == 3 and not SHORTCUTS[shortcut_titles[i]][2]:
+            pass
+        else:
+            if i == len(shortcut_titles) - 1:
+                print(s, end=">    ")
+            elif i % 2 == 0:
+                print(s, end=", ")
+            elif i % 2 == 1:
+                print(s)
 
     #   INPUT MODE
-    inputted_string = input().strip()
+    inputted_string = input().strip().lower()
 
     # OLD REGEX : re.match(r'(?i)^[1-7]$|^[qwep]$|^[asdf]$|^[gty]$|^[r]$', inputted_string)
     # Put all shortcuts in one string
-    regex = ''
-    for i in SHORTCUTS.items():
-        for ii in i[1][1:]:
-            regex += ii
+    shortcut_keys = []
+    for key, value in SHORTCUTS.items():
+        for element in value[1:]:
+            if not isinstance(element, bool):
+                shortcut_keys.append(element.lower())
 
-    if re.match(fr'(?i)(^[{regex}]$)|(^[{regex}]\s)', inputted_string):
+    if inputted_string in shortcut_keys:
         browse(inputted_string[0:1], inputted_string[1:len(inputted_string)].strip())
     elif inputted_string.lower() == 'exit':
         quit()
