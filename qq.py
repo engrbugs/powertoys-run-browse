@@ -8,7 +8,7 @@ import time
 import pyperclip
 
 """Launching web browsers for PowerToys Run"""
-version = '1.2.0'
+version = '1.2.1'
 default_options = '1'
 
 SHORTCUTS = {
@@ -29,17 +29,29 @@ SHORTCUTS = {
 }
 chat_gpt_main_website = "https://chat.openai.com/chat"
 #  (X) marks the spot for pyperclip
+
+CHATGPT: {
+    "1": ["Please correct my grammar:\n(X)"],
+    "11": ["Correct my grammar and provide only the corrected text without introductions or conclusions:\n"],
+    "2": ["Improve my paragraph"],
+    "3": ["Make this more impactful"],
+    "4": ["(X)\nDraft an email addressing the above context with these response points:"],
+    "5": ["Summarize this for a high school student:\n"],
+    "55": ["Explain this to me like I’m a five-year-old"],
+    "6": ["What is the difference between "]
+}
+
+
 CHATGPT = {
     '1': ['Please correct my grammar:\n(X)'],
-    '11': ['correct my grammar, answer only the corrected context. Without your typical introduction and conclusion:\n'],
-    '2': ['improve my paragraph'],
-    '3': ['make that powerful'],
-    '4': ["(X)\nCompose an email draft that addresses the above context, here's the reponse points:"],
+    '2': ['Improve my paragraph'],
+    '3': ['Make that powerful'],
+    '4': ["(X)\nCompose an email draft that addresses the above context. Here's the response points:"],
     '5': ['Summarize this for a high school student:\n'],
-    '55': ["explain that to me like I’m a five-year-old kid"],
-    '6': ['what is the difference between '],
-
+    '55': ["Explain that to me like I’m a five-year-old kid"],
+    '6': ['What is the difference between '],
 }
+
 
 def count_visible_shortcuts(shortcuts_dict):
     count = 0
@@ -60,12 +72,6 @@ def GrammarGPT(words):
     text_in_clipboard = pyperclip.paste()
     cp.copy_to_clipboard(CHATGPT['1'].replace("(X)", text_in_clipboard))
 
-    #  webbrowser.open(chat_gpt_main_website)
-    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    #  webbrowser.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 # Maintained by engrbugs.
 def chat_gpt(words):
@@ -175,15 +181,13 @@ if __name__ == '__main__':
     #   INPUT MODE
     inputted_string = input().strip().lower()
 
-    # OLD REGEX : re.match(r'(?i)^[1-7]$|^[qwep]$|^[asdf]$|^[gty]$|^[r]$', inputted_string)
-    # Put all shortcuts in one string
     shortcut_keys = []
     for key, value in SHORTCUTS.items():
         for element in value[1:]:
             if not isinstance(element, bool):
                 shortcut_keys.append(element.lower())
 
-    if inputted_string in shortcut_keys:
+    if inputted_string.split(' ')[0] in shortcut_keys:
         browse(inputted_string[0:1], inputted_string[1:len(inputted_string)].strip())
     elif inputted_string.lower() == 'exit':
         quit()
