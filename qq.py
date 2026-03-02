@@ -31,7 +31,7 @@ chat_gpt_main_website = "https://chat.openai.com/chat"
 #  (X) marks the spot for pyperclip
 
 CHATGPT: {
-    "1": ["Please correct my grammar:\n(X)"],
+    "1": ["Please correct the grammar and punctuation from my dictation:\n(X)"],
     "11": ["Correct my grammar and provide only the corrected text without introductions or conclusions:\n"],
     "2": ["Improve my paragraph"],
     "3": ["Make this more impactful"],
@@ -43,7 +43,7 @@ CHATGPT: {
 
 
 CHATGPT = {
-    '1': ['Please correct my grammar:\n(X)'],
+    '1': ['Please correct the grammar and punctuation from my dictation:\n(X)'],
     '2': ['Improve my paragraph'],
     '3': ['Make that powerful'],
     '4': ["(X)\nCompose an email draft that addresses the above context. Here's the response points:"],
