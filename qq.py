@@ -8,8 +8,9 @@ import time
 import pyperclip
 
 """Launching web browsers for PowerToys Run"""
+
 version = '1.2.1'
-default_options = '1'
+default_options = 'C1'
 
 SHORTCUTS = {
     "Define": ['https://www.google.com/search?q={words} define', '1', 'q'],
@@ -25,7 +26,7 @@ SHORTCUTS = {
     "Ludwig": ['https://ludwig.guru/s/{words}', '9', 'L'],
     "Bible": ['https://www.biblegateway.com/quicksearch/?quicksearch={words}&version=NIV', 'B'],
     "Chat-GPT": ['[chat_gpt]', 'C'],
-    "GrammarGPT": ['[GrammarGPT]', 'C1', False]  # False is the visibility (typical)
+    "GrammarGPT": ['[GrammarGPT]', 'C1', True]  # False is the visibility (typical)
 }
 chat_gpt_main_website = "https://chat.openai.com/chat"
 #  (X) marks the spot for pyperclip
@@ -63,14 +64,13 @@ def count_visible_shortcuts(shortcuts_dict):
 
 def GrammarGPT(words):
     if words == '':
-        print('What to put in clipboard')
-        for key, value in CHATGPT.items():
-            print(key, value)
-        print('pick number', end=":                        ")
-        words = input().strip()
+        words = '1'  # default to grammar correction
 
-    text_in_clipboard = pyperclip.paste()
-    cp.copy_to_clipboard(CHATGPT['1'].replace("(X)", text_in_clipboard))
+    if words in CHATGPT:
+        text_in_clipboard = pyperclip.paste()
+        cp.copy_to_clipboard(CHATGPT[words][0].replace("(X)", text_in_clipboard))
+    else:
+        print(f'Invalid option: {words}')
 
 
 # Maintained by engrbugs.
@@ -187,8 +187,16 @@ if __name__ == '__main__':
             if not isinstance(element, bool):
                 shortcut_keys.append(element.lower())
 
-    if inputted_string.split(' ')[0] in shortcut_keys:
-        browse(inputted_string[0:1], inputted_string[1:len(inputted_string)].strip())
+    # Find the longest matching shortcut key prefix
+    matched_key = None
+    for sk in sorted(shortcut_keys, key=len, reverse=True):
+        if inputted_string.startswith(sk):
+            matched_key = sk
+            break
+
+    if matched_key:
+        remainder = inputted_string[len(matched_key):].strip()
+        browse(matched_key, remainder)
     elif inputted_string.lower() == 'exit':
         quit()
     else:

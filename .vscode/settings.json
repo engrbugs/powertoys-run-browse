@@ -1,0 +1,14 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "chat.tools.terminal.autoApprove": {
+        "&": true,
+        "/^powershell -NoProfile -Command \"&\\('\\.\\\\\\.venv\\\\Scripts\\\\Activate\\.ps1'\\); pip install --upgrade pip setuptools wheel python-dateutil pyperclip\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cmd /k \"cd c:\\\\Users\\\\engrb\\\\OneDrive\\\\bugs\\\\Geek\\\\Python\\\\powertoys-run-browse && \\.venv\\\\Scripts\\\\pip\\.exe install --upgrade pip setuptools wheel python-dateutil pyperclip\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
