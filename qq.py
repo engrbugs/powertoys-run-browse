@@ -1,204 +1,264 @@
 #! /usr/bin/env python3
-import re
-import webbrowser
-from dateutil.parser import parse
+"""Launch web browsers and prompt helpers for PowerToys Run."""
+
+from __future__ import annotations
+
 import datetime
-import clipboard as cp
 import time
+import webbrowser
+
+import clipboard as cp
 import pyperclip
+from dateutil.parser import parse
 
-"""Launching web browsers for PowerToys Run"""
-
-version = '1.2.1'
-default_options = 'C1'
+VERSION = "1.2.1"
+DEFAULT_OPTION = "C1"
 
 SHORTCUTS = {
-    "Define": ['https://www.google.com/search?q={words} define', '1', 'q'],
-    "Thesaurus": ['https://www.google.com/search?q={words} thesaurus', '2', 'w'],
-    "Youtube": ['https://www.youtube.com/results?search_query={words}', '3', 'y'],
-    "Reverse Dictionary": ['https://www.onelook.com/reverse-dictionary.shtml?s={words}', '4', 'q'],
-    "Google Pronunciation": ['https://www.google.com/search?q={words} pronunciation', '5', 'p'],
-    "Github": ['https://github.com/search?q={words}', '6', 'g'],
-    "stackoverflow": ['https://stackoverflow.com/search?q={words}', '7', 's'],
-    "Calendar": ['https://calendar.google.com/calendar/u/0/r/day/{words}', '8'],
-    "Reddit": ['https://www.reddit.com/', 'R'],
-    "Twitter": ['https://www.twitter.com/', 'T'],
-    "Ludwig": ['https://ludwig.guru/s/{words}', '9', 'L'],
-    "Bible": ['https://www.biblegateway.com/quicksearch/?quicksearch={words}&version=NIV', 'B'],
-    "Chat-GPT": ['[chat_gpt]', 'C'],
-    "GrammarGPT": ['[GrammarGPT]', 'C1', True]  # False is the visibility (typical)
+    "Define": ["https://www.google.com/search?q={words} define", "1", "q"],
+    "Thesaurus": ["https://www.google.com/search?q={words} thesaurus", "2", "w"],
+    "Youtube": ["https://www.youtube.com/results?search_query={words}", "3", "y"],
+    "Reverse Dictionary": ["https://www.onelook.com/reverse-dictionary.shtml?s={words}", "4", "q"],
+    "Google Pronunciation": ["https://www.google.com/search?q={words} pronunciation", "5", "p"],
+    "Github": ["https://github.com/search?q={words}", "6", "g"],
+    "stackoverflow": ["https://stackoverflow.com/search?q={words}", "7", "s"],
+    "Calendar": ["https://calendar.google.com/calendar/u/0/r/day/{words}", "8"],
+    "Reddit": ["https://www.reddit.com/", "R"],
+    "Twitter": ["https://www.twitter.com/", "T"],
+    "Ludwig": ["https://ludwig.guru/s/{words}", "9", "L"],
+    "Bible": [
+        "https://www.biblegateway.com/quicksearch/?quicksearch={words}&version=NIV",
+        "B",
+    ],
+    "Chat-GPT": ["[chat_gpt]", "C"],
+    "GrammarGPT": ["[GrammarGPT]", "C1", True],
 }
-chat_gpt_main_website = "https://chat.openai.com/chat"
-#  (X) marks the spot for pyperclip
-
-CHATGPT: {
-    "1": ["Please correct the grammar and punctuation from my dictation:\n(X)"],
-    "11": ["Correct my grammar and provide only the corrected text without introductions or conclusions:\n"],
-    "2": ["Improve my paragraph"],
-    "3": ["Make this more impactful"],
-    "4": ["(X)\nDraft an email addressing the above context with these response points:"],
-    "5": ["Summarize this for a high school student:\n"],
-    "55": ["Explain this to me like I’m a five-year-old"],
-    "6": ["What is the difference between "]
-}
-
 
 CHATGPT = {
-    '1': ['Please correct the grammar and punctuation from my dictation:\n(X)'],
-    '2': ['Improve my paragraph'],
-    '3': ['Make that powerful'],
-    '4': ["(X)\nCompose an email draft that addresses the above context. Here's the response points:"],
-    '5': ['Summarize this for a high school student:\n'],
-    '55': ["Explain that to me like I’m a five-year-old kid"],
-    '6': ['What is the difference between '],
+    "1": {
+        "title": "Grammar Fix",
+        "prompts": ["Please correct the grammar and punctuation from my dictation:\n(X)"],
+    },
+    "2": {
+        "title": "Improve Paragraph",
+        "prompts": ["Improve my paragraph"],
+    },
+    "3": {
+        "title": "Make Powerful",
+        "prompts": ["Make that powerful"],
+    },
+    "4": {
+        "title": "Draft Email",
+        "prompts": ["(X)\nCompose an email draft that addresses the above context. Here's the response points:"],
+    },
+    "5": {
+        "title": "Summarize Simply",
+        "prompts": ["Summarize this for a high school student:\n"],
+    },
+    "55": {
+        "title": "Explain Like 5",
+        "prompts": ["Explain that to me like I'm a five-year-old kid"],
+    },
+    "6": {
+        "title": "Compare Things",
+        "prompts": ["What is the difference between "],
+    },
+    "7": {
+        "title": "Conversation Checkpoint",
+        "prompts": [
+            """
+Act as a documentation archivist.
+
+Consolidate our entire conversation into a single Markdown (.md) file for saving as a checkpoint.
+
+**Requirements:**
+1. **Title:** Start with a clear top-level title using `#` (e.g., `# Conversation Checkpoint: [Topic or Date]`).
+2. **Structure:** Label each message using:
+   - `## User`
+   - `## Assistant`
+3. **Integrity:** Preserve all original formatting exactly (code blocks, lists, LaTeX, tables, etc.).
+4. **Separation:** Insert a horizontal rule (`---`) between each full exchange.
+5. **Completeness:** Include the full conversation history without summarizing or omitting anything.
+6. **Output Format:** Wrap the entire result inside a single Markdown code block for easy copy-paste.
+
+Generate the complete `.md` file now.
+          """
+        ],
+    },
 }
 
 
-def count_visible_shortcuts(shortcuts_dict):
-    count = 0
+def count_visible_shortcuts(shortcuts_dict: dict[str, list[object]]) -> int:
+    visible_count = 0
     for value in shortcuts_dict.values():
-        # Check if the last element exists and is not False
         if value and value[-1] is not False:
-            count += 1
-    return count
+            visible_count += 1
+    return visible_count
 
-def GrammarGPT(words):
-    if words == '':
-        words = '1'  # default to grammar correction
+
+def grammar_gpt(words: str) -> None:
+    if not words:
+        words = "1"
 
     if words in CHATGPT:
         text_in_clipboard = pyperclip.paste()
-        cp.copy_to_clipboard(CHATGPT[words][0].replace("(X)", text_in_clipboard))
+        prompt = CHATGPT[words]["prompts"][0]
+        cp.copy_to_clipboard(prompt.replace("(X)", text_in_clipboard))
     else:
-        print(f'Invalid option: {words}')
+        print(f"Invalid option: {words}")
 
 
-# Maintained by engrbugs.
-def chat_gpt(words):
-    if words == '':
-        print('What to put in clipboard')
+def GrammarGPT(words: str) -> None:
+    """Keep the original callable name used by shortcut dispatch."""
+    grammar_gpt(words)
+
+
+def chat_gpt(words: str) -> None:
+    if not words:
+        print("ChatGPT prompts")
         for key, value in CHATGPT.items():
-            print(key, value)
-        print('pick number', end=":                        ")
+            print(f"{key:>2}  {value['title']}")
+        print("pick number", end=":                        ")
         words = input().strip()
 
     if words in CHATGPT:
-        for phrase in CHATGPT[words]:
-            text_in_clipboard = pyperclip.paste()
-            cp.copy_to_clipboard(phrase.replace("(X)",text_in_clipboard))
-            if len(CHATGPT[words]) != 1:
+        text_in_clipboard = pyperclip.paste()
+        prompts = CHATGPT[words]["prompts"]
+        for phrase in prompts:
+            cp.copy_to_clipboard(phrase.replace("(X)", text_in_clipboard))
+            if len(prompts) != 1:
                 time.sleep(1)
 
-    #  webbrowser.open(chat_gpt_main_website)
 
-
-def open_main_website(link, append=''):
-    main_website = link[:link.find('/', 9) + 1]
+def open_main_website(link: str, append: str = "") -> None:
+    main_website = link[: link.find("/", 9) + 1]
     webbrowser.open(main_website + append)
-    quit()
+    raise SystemExit
 
 
-def run_function(func_name, *args):
-    return globals()[func_name](*args)
+def run_function(func_name: str, *args: str) -> None:
+    globals()[func_name](*args)
 
 
-def browse(browse_choice, words):
-    print(f'opening, {browse_choice}, {words}')
-    for k in SHORTCUTS:
-        if any(a in SHORTCUTS[k] for a in [browse_choice.lower(), browse_choice.upper()]):
-            if '{' in SHORTCUTS[k][0]:
-                if k == 'Calendar':
-                    okay = None
-                    while okay is None:
-                        if words == '' or words == 'main':
-                            main_website = SHORTCUTS[k][0][:SHORTCUTS[k][0].rfind('/')].replace('day', 'month')
-                            webbrowser.open(main_website)
-                            quit()
-                        try:
-                            date = parse(words)
-                            words = date.strftime('%Y/%#m/%#d')
-                            break
-                        except:
-                            today = datetime.date.today()
-                            if words.lower() == 'today' or words.lower() == 'now':
-                                today = datetime.date.today()
-                                words = today.strftime('%Y/%#m/%#d')
-                            elif words.lower() == 'yesterday' or words.lower() == 'yday':
-                                yesterday = today - datetime.timedelta(days=1)
-                                words = yesterday.strftime('%Y/%#m/%#d')
-                                print(words)
-                            elif words.lower() == 'tomorrow' or words.lower() == 'tom':
-                                tomorrow = today + datetime.timedelta(days=1)
-                                words = tomorrow.strftime('%Y/%#m/%#d')
-                            else:
-                                print('Cannot read date')
-                                print('Please enter new date or press ENTER for month)', end=":    ")
-                                words = input()
-                # check '#' character in choice replace it with %23 if found. for C#
-                if '#' in words:
-                    google_word = ''
-                    for c in words:
-                        google_word += '%23' if c == '#' else c
-                    words = google_word
-                if words == '':
-                    print('What to search', end=":                        ")
-                    words = input().strip()
-                    if words == "":
-                        words = 'main'
-            elif '[' in SHORTCUTS[k][0]:
-                function_name = SHORTCUTS[k][0].replace("[", "").replace("]", "")
-                run_function(function_name, words)
-                quit()
+def prompt_for_search_terms() -> str:
+    print("What to search", end=":                        ")
+    return input().strip() or "main"
+
+
+def encode_hash_characters(words: str) -> str:
+    return words.replace("#", "%23")
+
+
+def resolve_calendar_words(words: str) -> str:
+    while True:
+        if words in {"", "main"}:
+            main_website = SHORTCUTS["Calendar"][0][: SHORTCUTS["Calendar"][0].rfind("/")].replace(
+                "day", "month"
+            )
+            webbrowser.open(main_website)
+            raise SystemExit
+
+        try:
+            parsed_date = parse(words)
+            return parsed_date.strftime("%Y/%#m/%#d")
+        except (OverflowError, TypeError, ValueError):
+            today = datetime.date.today()
+            lowered = words.lower()
+            if lowered in {"today", "now"}:
+                return today.strftime("%Y/%#m/%#d")
+            if lowered in {"yesterday", "yday"}:
+                return (today - datetime.timedelta(days=1)).strftime("%Y/%#m/%#d")
+            if lowered in {"tomorrow", "tom"}:
+                return (today + datetime.timedelta(days=1)).strftime("%Y/%#m/%#d")
+
+            print("Cannot read date")
+            print("Please enter new date or press ENTER for month)", end=":    ")
+            words = input().strip()
+
+
+def browse(browse_choice: str, words: str) -> None:
+    print(f"opening, {browse_choice}, {words}")
+    normalized_choice = {browse_choice.lower(), browse_choice.upper()}
+
+    for title, shortcut in SHORTCUTS.items():
+        if not any(option in shortcut for option in normalized_choice):
+            continue
+
+        target = shortcut[0]
+        if "{" in target:
+            if title == "Calendar":
+                words = resolve_calendar_words(words)
             else:
-                webbrowser.open(SHORTCUTS[k][0])
-                quit()
-            if words.lower() == 'main':
-                open_main_website(SHORTCUTS[k][0])
-            elif words.lower() == 'me' and 'github' in SHORTCUTS[k][0]:
-                open_main_website(SHORTCUTS[k][0], 'engrbugs')
-            else:
-                webbrowser.open(SHORTCUTS[k][0].format(words=words))
-
-
-if __name__ == '__main__':
-    #   PAINT SCREEN
-    len_shortcuts_shown = count_visible_shortcuts(SHORTCUTS)
-    is_default = lambda x: x + "*" if x == default_options else x
-    print(f'*Default v{version}')  # New Line
-    shortcut_titles = [title for title, value in SHORTCUTS.items() if value and value[-1] is not False]
-    for i in range(0, len_shortcuts_shown):
-        s = f'[{is_default(SHORTCUTS[shortcut_titles[i]][1])}]{shortcut_titles[i]}'
-        if len_shortcuts_shown == 3 and not SHORTCUTS[shortcut_titles[i]][2]:
-            pass
+                words = encode_hash_characters(words)
+                if not words:
+                    words = prompt_for_search_terms()
+        elif "[" in target:
+            function_name = target.replace("[", "").replace("]", "")
+            run_function(function_name, words)
+            raise SystemExit
         else:
-            if i == len(shortcut_titles) - 1:
-                print(s, end=">    ")
-            elif i % 2 == 0:
-                print(s, end=", ")
-            elif i % 2 == 1:
-                print(s)
+            webbrowser.open(target)
+            raise SystemExit
 
-    #   INPUT MODE
-    inputted_string = input().strip().lower()
+        if words.lower() == "main":
+            open_main_website(target)
+        if words.lower() == "me" and "github" in target:
+            open_main_website(target, "engrbugs")
 
-    shortcut_keys = []
-    for key, value in SHORTCUTS.items():
+        webbrowser.open(target.format(words=words))
+        return
+
+
+def print_shortcuts() -> None:
+    visible_shortcut_count = count_visible_shortcuts(SHORTCUTS)
+    shortcut_titles = [title for title, value in SHORTCUTS.items() if value and value[-1] is not False]
+
+    def format_default(option: str) -> str:
+        return f"{option}*" if option == DEFAULT_OPTION else option
+
+    print(f"*Default v{VERSION}")
+    for index, title in enumerate(shortcut_titles):
+        shortcut = SHORTCUTS[title]
+        display_text = f"[{format_default(shortcut[1])}]{title}"
+        if visible_shortcut_count == 3 and len(shortcut) > 2 and not shortcut[2]:
+            continue
+        if index == len(shortcut_titles) - 1:
+            print(display_text, end=">    ")
+        elif index % 2 == 0:
+            print(display_text, end=", ")
+        else:
+            print(display_text)
+
+
+def get_matched_shortcut_key(inputted_string: str) -> str | None:
+    shortcut_keys: list[str] = []
+    for value in SHORTCUTS.values():
         for element in value[1:]:
             if not isinstance(element, bool):
                 shortcut_keys.append(element.lower())
 
-    # Find the longest matching shortcut key prefix
-    matched_key = None
-    for sk in sorted(shortcut_keys, key=len, reverse=True):
-        if inputted_string.startswith(sk):
-            matched_key = sk
-            break
+    for shortcut_key in sorted(shortcut_keys, key=len, reverse=True):
+        if inputted_string.startswith(shortcut_key):
+            return shortcut_key
+    return None
+
+
+def main() -> None:
+    print_shortcuts()
+
+    inputted_string = input().strip().lower()
+    matched_key = get_matched_shortcut_key(inputted_string)
 
     if matched_key:
-        remainder = inputted_string[len(matched_key):].strip()
+        remainder = inputted_string[len(matched_key) :].strip()
         browse(matched_key, remainder)
-    elif inputted_string.lower() == 'exit':
-        quit()
-    else:
-        #  Search with default option--Google.
-        browse(default_options, inputted_string)
+        return
+
+    if inputted_string == "exit":
+        raise SystemExit
+
+    browse(DEFAULT_OPTION, inputted_string)
+
+
+if __name__ == "__main__":
+    main()
