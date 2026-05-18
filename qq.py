@@ -12,7 +12,7 @@ import pyperclip
 from dateutil.parser import parse
 
 VERSION = "1.2.1"
-DEFAULT_OPTION = "C1"
+DEFAULT_OPTION = "1"
 
 SHORTCUTS = {
     "Define": ["https://www.google.com/search?q={words} define", "1", "q"],
