@@ -238,7 +238,9 @@ def get_matched_shortcut_key(inputted_string: str) -> str | None:
                 shortcut_keys.append(element.lower())
 
     for shortcut_key in sorted(shortcut_keys, key=len, reverse=True):
-        if inputted_string.startswith(shortcut_key):
+        if inputted_string == shortcut_key:
+            return shortcut_key
+        if inputted_string.startswith(shortcut_key + " "):
             return shortcut_key
     return None
 
