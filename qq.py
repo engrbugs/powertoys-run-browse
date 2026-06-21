@@ -14,6 +14,11 @@ from dateutil.parser import parse
 VERSION = "1.2.1"
 DEFAULT_OPTION = "1"
 
+# LLM Server configuration
+SERVER_URL = "http://192.168.1.88:5000"
+TARGET_TPS = 50
+
+
 SHORTCUTS = {
     "Define": ["https://www.google.com/search?q={words} define", "1", "q"],
     "Thesaurus": ["https://www.google.com/search?q={words} thesaurus", "2", "w"],
@@ -32,6 +37,7 @@ SHORTCUTS = {
     ],
     "Chat-GPT": ["[chat_gpt]", "C"],
     "GrammarGPT": ["[GrammarGPT]", "C1", True],
+    "LLM AutoGrammar": ["[LLM AutoGrammar]", "X1", True],
 }
 
 CHATGPT = {
