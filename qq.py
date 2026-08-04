@@ -20,13 +20,23 @@ from dateutil.parser import parse
 VERSION = "1.2.2"
 DEFAULT_OPTION = "1"
 
-# LLM Server configuration
-SERVER_URL = "http://192.168.1.88:5000"
-TARGET_TPS = 50
-LLM_MODEL = "local-model"
-DEFAULT_CONTEXT_TOKENS = 8192
-MAX_INPUT_CONTEXT_RATIO = 0.4
-EXIT_PAUSE_SECONDS = 2
+try:
+    import config as user_config
+except ImportError:
+    user_config = None
+
+
+def config_value(name: str, default: object) -> object:
+    return getattr(user_config, name, default) if user_config else default
+
+
+# Override these values in config.py for a local LLM or compatible API endpoint.
+SERVER_URL = str(config_value("SERVER_URL", "http://192.168.1.88:5000"))
+TARGET_TPS = int(config_value("TARGET_TPS", 50))
+LLM_MODEL = str(config_value("LLM_MODEL", "local-model"))
+DEFAULT_CONTEXT_TOKENS = int(config_value("DEFAULT_CONTEXT_TOKENS", 8192))
+MAX_INPUT_CONTEXT_RATIO = float(config_value("MAX_INPUT_CONTEXT_RATIO", 0.4))
+EXIT_PAUSE_SECONDS = float(config_value("EXIT_PAUSE_SECONDS", 2))
 
 
 SHORTCUTS = {
@@ -480,24 +490,37 @@ def browse(browse_choice: str, words: str) -> None:
 
 
 def print_shortcuts() -> None:
-    visible_shortcut_count = count_visible_shortcuts(SHORTCUTS)
-    shortcut_titles = [title for title, value in SHORTCUTS.items() if value and value[-1] is not False]
+    groups = {
+        "Search": [
+            "Define",
+            "Thesaurus",
+            "Youtube",
+            "Reverse Dictionary",
+            "Google Pronunciation",
+            "Github",
+            "stackoverflow",
+            "Ludwig",
+            "Bible",
+        ],
+        "Open": ["Calendar", "Reddit", "Twitter"],
+        "Clipboard + AI": ["Chat-GPT", "GrammarGPT", "LLM AutoGrammar"],
+    }
 
-    def format_default(option: str) -> str:
-        return f"{option}*" if option == DEFAULT_OPTION else option
+    print(f"PowerToys Run Browse v{VERSION}")
+    print("Type a shortcut, optionally followed by a phrase.")
+    print("Examples:  g python pathlib   |   y ambient music   |   X1")
+    print()
 
-    print(f"*Default v{VERSION}")
-    for index, title in enumerate(shortcut_titles):
-        shortcut = SHORTCUTS[title]
-        display_text = f"[{format_default(shortcut[1])}]{title}"
-        if visible_shortcut_count == 3 and len(shortcut) > 2 and not shortcut[2]:
-            continue
-        if index == len(shortcut_titles) - 1:
-            print(display_text, end=">    ")
-        elif index % 2 == 0:
-            print(display_text, end=", ")
-        else:
-            print(display_text)
+    for group_name, titles in groups.items():
+        entries = []
+        for title in titles:
+            shortcut = SHORTCUTS[title]
+            key = shortcut[1]
+            marker = "*" if key == DEFAULT_OPTION else ""
+            entries.append(f"{key}{marker} {title}")
+        print(f"{group_name}: " + "  ·  ".join(entries))
+
+    print("\nReady > ", end="", flush=True)
 
 
 def get_matched_shortcut_key(inputted_string: str) -> str | None:

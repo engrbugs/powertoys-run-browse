@@ -60,6 +60,8 @@ flowchart LR
 
 Shortcuts are defined near the top of `qq.py`, so adding or changing a destination does not require a framework or a build step.
 
+When the launcher starts, it prints a compact grouped menu and a `Ready >` prompt. The default shortcut is marked with `*`; entering a phrase without a shortcut uses the default definition search.
+
 ## Setup
 
 ### Requirements
@@ -82,6 +84,25 @@ C:\ProgramData\Microsoft\Windows\Start Menu\Programs
 ```
 
 Then press `Alt+Space`, type `qq`, and enter a shortcut plus an optional search phrase.
+
+## Clean local configuration
+
+Copy [`config.example.py`](config.example.py) to `config.py` when you want to customize the LLM connection:
+
+```powershell
+Copy-Item config.example.py config.py
+```
+
+Then edit `config.py`:
+
+```python
+SERVER_URL = "http://your-llm-server:5000"
+LLM_MODEL = "your-model-name"
+DEFAULT_CONTEXT_TOKENS = 8192
+MAX_INPUT_CONTEXT_RATIO = 0.4
+```
+
+The launcher works without `config.py`; browser shortcuts and copy-only prompts use the built-in defaults. `config.py` is ignored by Git so machine-specific settings stay local.
 
 ## Optional local grammar helper
 
@@ -109,6 +130,8 @@ The checked-in configuration currently points to a private local-network address
 ## Project layout
 
 - `qq.py` — shortcut registry, browser routing, calendar parsing, prompts, and optional local-model calls
+- `config.example.py` — safe starting point for local LLM/API settings
+- `config.py` — your private machine-specific configuration (not committed)
 - `clipboard.py` — small clipboard helper
 - `requirements.txt` — runtime dependencies
 - `readme-images/` — usage animation

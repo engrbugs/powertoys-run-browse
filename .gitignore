@@ -2,3 +2,7 @@
 /debug.log
 /.idea/vcs.xml
 /.idea/aws.xml
+
+# Local LLM settings
+config.py
+__pycache__/
