@@ -89,6 +89,23 @@ The `X1` shortcut reads the current clipboard, builds a preservation-focused cor
 
 This feature is optional. Browser shortcuts and the copy-only prompt helpers do not require an LLM server. If you use `X1`, review `SERVER_URL` and `LLM_MODEL` for your own local setup before running it.
 
+## Latest update · local LLM shortcut
+
+The local LLM shortcut is configured in `qq.py` with the following defaults:
+
+```python
+SERVER_URL = "http://192.168.1.88:5000"
+TARGET_TPS = 50
+LLM_MODEL = "local-model"
+DEFAULT_CONTEXT_TOKENS = 8192
+MAX_INPUT_CONTEXT_RATIO = 0.4
+EXIT_PAUSE_SECONDS = 2
+```
+
+Use `X1` from PowerToys Run to send the current clipboard text to that local server for automatic grammar cleanup. The helper detects the model context window when possible, avoids sending oversized clipboard contents, and copies the corrected result back to the clipboard.
+
+The endpoint above is a private local-network address. Replace it with the address and model name used by your own local LLM server before sharing the setup with another machine.
+
 ## Project layout
 
 - `qq.py` — shortcut registry, browser routing, calendar parsing, prompts, and optional local-model calls
