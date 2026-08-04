@@ -6,6 +6,10 @@ PowerToys Run Browse gives common destinations a memorable shortcut. Type one co
 
 It is intentionally lightweight: a Python script, a set of readable shortcuts, and an optional local language-model connection for clipboard-based grammar cleanup.
 
+[![PowerToys Run Browse in action](readme-images/powertoys-run-browse.gif)](https://github.com/engrbugs/powertoys-run-browse)
+
+*A quick look at the launcher workflow.*
+
 ## Why it is useful
 
 The time savings come from removing tiny interruptions:
